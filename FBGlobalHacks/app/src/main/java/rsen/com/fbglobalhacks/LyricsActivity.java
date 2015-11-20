@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,6 +49,7 @@ public class LyricsActivity extends AppCompatActivity {
     MyRecyclerAdapter adapter;
     List<Lyric> lyrics;
     long timestampAdjustment = 0;
+    String lastSong = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,14 +84,22 @@ public class LyricsActivity extends AppCompatActivity {
         firebase.child("lyrics").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Reader reader = new StringReader(dataSnapshot.getValue(String.class));
+                String lyricsString = dataSnapshot.getValue(String.class);
+                Log.d("lyrics", lyricsString);
+                try {
+                    Reader reader = new StringReader(lyricsString);
 
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                Gson gson = gsonBuilder.create();
-                lyrics = new ArrayList<Lyric>();
-                lyrics = Arrays.asList(gson.fromJson(reader, Lyric[].class));
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    Gson gson = gsonBuilder.create();
+                    lyrics = new ArrayList<Lyric>();
+                    lyrics = Arrays.asList(gson.fromJson(reader, Lyric[].class));
 
-                recyclerView.setAdapter(new MyRecyclerAdapter(LyricsActivity.this, lyrics, timestampAdjustment));
+                    recyclerView.setAdapter(new MyRecyclerAdapter(LyricsActivity.this, lyrics, timestampAdjustment));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -98,12 +108,38 @@ public class LyricsActivity extends AppCompatActivity {
             }
         });
 
+
     }
     private ValueEventListener timestampEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             timestampAdjustment = dataSnapshot.getValue(Long.class);
-            recyclerView.setAdapter(new MyRecyclerAdapter(LyricsActivity.this, lyrics, timestampAdjustment));
+            if (lyrics != null) {
+                recyclerView.setAdapter(new MyRecyclerAdapter(LyricsActivity.this, lyrics, timestampAdjustment));
+            }
+        }
+
+        @Override
+        public void onCancelled(FirebaseError firebaseError) {
+
+        }
+    };
+    private ValueEventListener songEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            String song = dataSnapshot.getValue(String.class);
+            if (lastSong == null)
+            {
+                lastSong = song;
+            }
+            else if (!song.equals(lastSong)) {
+                if (song.length() > 0) {
+                    firebase.removeEventListener(songEventListener);
+                    Intent i = new Intent(LyricsActivity.this, LyricsActivity.class);
+                    i.putExtra("song", song);
+                    startActivity(i);
+                }
+            }
         }
 
         @Override
@@ -181,13 +217,15 @@ public class LyricsActivity extends AppCompatActivity {
         super.onPause();
         ImageLoader.getInstance().stop();
         firebase.removeEventListener(timestampEventListener);
+        firebase.removeEventListener(songEventListener);
         stopService(new Intent(this, RecordAudioService.class));
     }
 
-    @Override
+        @Override
     protected void onResume() {
         super.onResume();
         firebase.child("timestamp").addValueEventListener(timestampEventListener);
+        firebase.child("song").addValueEventListener(songEventListener);
         startService(new Intent(this, RecordAudioService.class));
 
     }

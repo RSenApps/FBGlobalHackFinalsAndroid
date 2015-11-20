@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -7,35 +7,46 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:animateLayoutChanges="true"
     android:paddingRight="@dimen/activity_horizontal_margin"
     tools:context="rsen.com.fbglobalhacks.MainActivity"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main"
     android:paddingTop="@dimen/activity_vertical_margin">
 
-    <android.support.v7.widget.RecyclerView
-        android:clipToPadding="false"
-        android:id="@+id/recyclerView"
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="30dp"
+        android:elevation="3dp"
+        android:layout_marginBottom="30dp" />
+    <ImageView
+        android:id="@+id/startRecording"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+
+        android:src="@drawable/ic_listen_button" />
+
     <at.grabner.circleprogress.CircleProgressView
         android:id="@+id/circleView"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:visibility="gone"
         tools:visibility="visible"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         CircleProgressView:cpv_value="3.7"
         CircleProgressView:cpv_barColor="@color/colorAccent"
         CircleProgressView:cpv_barWidth="30dp"
-        CircleProgressView:cpv_contourSize="2dp"
+        CircleProgressView:cpv_contourSize="4dp"
         CircleProgressView:cpv_contourColor="@color/colorPrimaryDark"
         CircleProgressView:cpv_autoTextSize="true"
-        CircleProgressView:cpv_maxValue="5"
-        CircleProgressView:cpv_rimColor="@color/colorPrimary"
+        CircleProgressView:cpv_maxValue="8"
+        CircleProgressView:cpv_rimColor="@color/colorPrimaryDark"
         CircleProgressView:cpv_rimWidth="30dp"
         CircleProgressView:cpv_seekMode="false"
+        CircleProgressView:cpv_spinColor="@color/colorAccent"
         CircleProgressView:cpv_textColor="@color/colorPrimary"
         CircleProgressView:cpv_showUnit="false"     />
-</FrameLayout>
+</RelativeLayout>

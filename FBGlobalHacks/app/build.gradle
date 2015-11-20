@@ -3,6 +3,7 @@ allprojects {
     repositories {
         // ...
         maven { url "https://jitpack.io" }
+        mavenCentral()
     }
 }
 
@@ -39,6 +40,8 @@ dependencies {
     compile 'com.firebase:firebase-client-android:2.4.1+'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
     compile 'com.google.code.gson:gson:+'
+    compile 'com.skyfishjy.ripplebackground:library:1.0.1'
 
+    compile 'com.facebook.android:facebook-android-sdk:+'
 
 }

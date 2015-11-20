@@ -83,8 +83,8 @@
         android:src="@android:drawable/ic_menu_info_details" />
     <at.grabner.circleprogress.CircleProgressView
         android:id="@+id/circleView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_gravity="center"
         CircleProgressView:cpv_barColor="@color/colorAccent"
         CircleProgressView:cpv_barWidth="10dp"

@@ -26,7 +26,7 @@ public class RecordAudioService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (!isRunning) {
             isRunning = true;
-            audioRecorder = ExtAudioRecorder.getInstanse(true);
+            audioRecorder = ExtAudioRecorder.getInstanse(false);
 
             dir = Environment.getExternalStorageDirectory() + "/FBGlobalHacks/";
             File file = new File(dir);
@@ -42,7 +42,7 @@ public class RecordAudioService extends Service {
                         }
                         firstTime = false;
                         try {
-                            Thread.sleep(5000);
+                            Thread.sleep(8000);
                             if(audioRecorder != null) {
                                 audioRecorder.stop();
                                 new Thread(new Runnable() {
