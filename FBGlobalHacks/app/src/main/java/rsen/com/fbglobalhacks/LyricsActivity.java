@@ -1,6 +1,6 @@
 package rsen.com.fbglobalhacks;
 
-import android.media.Image;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -105,17 +104,6 @@ public class LyricsActivity extends AppCompatActivity {
         public void onDataChange(DataSnapshot dataSnapshot) {
             timestampAdjustment = dataSnapshot.getValue(Long.class);
             recyclerView.setAdapter(new MyRecyclerAdapter(LyricsActivity.this, lyrics, timestampAdjustment));
-            for (int i = 1; i < lyrics.size(); i++)
-            {
-                Lyric lyric = lyrics.get(i-1);
-                Lyric nextLyric = lyrics.get(i);
-                long adjustedTimestamp = System.currentTimeMillis() - timestampAdjustment;
-                if(lyric.timestamp >= adjustedTimestamp && nextLyric.timestamp < adjustedTimestamp)
-                {
-                    recyclerView.smoothScrollToPosition(i-1);
-                    break;
-                }
-            }
         }
 
         @Override
@@ -193,12 +181,14 @@ public class LyricsActivity extends AppCompatActivity {
         super.onPause();
         ImageLoader.getInstance().stop();
         firebase.removeEventListener(timestampEventListener);
+        stopService(new Intent(this, RecordAudioService.class));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         firebase.child("timestamp").addValueEventListener(timestampEventListener);
+        startService(new Intent(this, RecordAudioService.class));
 
     }
 }

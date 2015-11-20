@@ -12,6 +12,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -55,7 +57,8 @@ public class AudioUploader {
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
             dos = new DataOutputStream( conn.getOutputStream() );
             dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=\"upload.wav\";filename=\"" + selectedPath + "\"" + lineEnd);
+            String timeStamp = new File(selectedPath).getName().split(".")[0];
+            dos.writeBytes("Content-Disposition: form-data; name=\"" + timeStamp + "," + Locale.getDefault().getLanguage() +"\";filename=\"" + timeStamp + "," + Locale.getDefault().getLanguage() +"\"" + lineEnd);
             dos.writeBytes(lineEnd);
             // create a buffer of maximum size
             bytesAvailable = fileInputStream.available();

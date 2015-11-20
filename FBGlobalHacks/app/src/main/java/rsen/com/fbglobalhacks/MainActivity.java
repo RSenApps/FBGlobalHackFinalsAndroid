@@ -28,12 +28,12 @@ import at.grabner.circleprogress.CircleProgressView;
 import at.grabner.circleprogress.TextMode;
 
 public class MainActivity extends AppCompatActivity {
-    ExtAudioRecorder audioRecorder;
      CircleProgressView progress;
      RecyclerView recyclerView;
      FloatingActionButton fab;
     String lastSong = null;
     Firebase firebase;
+    boolean dontKillService = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,13 +43,6 @@ public class MainActivity extends AppCompatActivity {
         Firebase.setAndroidContext(this);
         firebase = new Firebase("https://fbglobalhacks.firebaseio.com/");
 
-        audioRecorder = ExtAudioRecorder.getInstanse(true);
-        final String dir = Environment.getExternalStorageDirectory() + "/FBGlobalHacks/";
-        final String filePath =  dir + System.currentTimeMillis() + ".wav";
-        File file = new File(dir);
-        file.mkdirs();
-        audioRecorder.setOutputFile(filePath);
-        audioRecorder.prepare();
         progress = (CircleProgressView) findViewById(R.id.circleView);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -70,11 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFinish() {
-                        audioRecorder.stop();
                         progress.setShowTextWhileSpinning(true);
                         progress.spin();
-                        progress.setText("Uploading...");
-                        new UploadAudio().execute(filePath);
+                        progress.setText("Processing...");
                     }
                 };
                 timer.start();
@@ -88,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        dontKillService = false;
         firebase.child("song").addValueEventListener(songEventListener);
     }
 
@@ -95,7 +87,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         firebase.child("song").removeEventListener(songEventListener);
+        if (!dontKillService)
+        {
+            stopService(new Intent(this, RecordAudioService.class));
+        }
     }
+
 
     private ValueEventListener songEventListener = new ValueEventListener() {
         @Override
@@ -107,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else if (!song.equals(lastSong))
             {
+                dontKillService = true;
                 Intent i = new Intent(MainActivity.this, LyricsActivity.class);
                 i.putExtra("song", song);
                 startActivity(i);
@@ -120,22 +118,9 @@ public class MainActivity extends AppCompatActivity {
     };
     private void startRecording()
     {
-        audioRecorder.start();
+        startService(new Intent(this, RecordAudioService.class));
 
     }
-    private class UploadAudio extends AsyncTask<String, Object, Object> {
-        @Override
-        protected Object doInBackground(String... params) {
-            AudioUploader.doFileUpload(params[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            progress.setText("Processing...");
-            progress.setSpinSpeed(-5);
-        }
-    };
 
 
 }

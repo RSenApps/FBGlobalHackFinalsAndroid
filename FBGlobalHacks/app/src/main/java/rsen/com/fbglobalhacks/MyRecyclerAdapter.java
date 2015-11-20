@@ -3,15 +3,10 @@ package rsen.com.fbglobalhacks;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -43,11 +38,11 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Ly
         try {
             Lyric nextLyric = lyrics.get(i + 1);
             long adjustedTimestamp = System.currentTimeMillis() - timestampAdjustment;
-            isCurrent = lyric.timestamp >= adjustedTimestamp && nextLyric.timestamp < adjustedTimestamp;
+            isCurrent = lyric.ts >= adjustedTimestamp && nextLyric.ts < adjustedTimestamp;
         } catch (Exception e) {
         }
         //Setting text view title
-        customViewHolder.textView.setText(lyric.line);
+        customViewHolder.textView.setText(lyric.l);
         if (isCurrent)
         {
             customViewHolder.textView.setTextSize(25);
